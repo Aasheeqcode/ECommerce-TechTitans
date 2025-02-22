@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shop - Personalized Recommendations</title>
+    <style>
+        /* General Styling */
+        /* General Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f9fc;
+    color: #2c3a47;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background-color: #1a4f8a;
+    color: white;
+    padding: 20px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-links a:hover {
+    background-color: #2c6bae;
+}
+
+main {
+    padding: 40px 0;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid #eaedf3;
+}
+
+h2 {
+    color: #1a4f8a;
+    margin-top: 0;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #425466;
+}
+
+select, input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d9e2ec;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #fcfdfe;
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: #2c6bae;
+    box-shadow: 0 0 0 2px rgba(42, 107, 174, 0.1);
+}
+
+button {
+    background-color: #1a4f8a;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+button:hover {
+    background-color: #2c6bae;
+}
+
+/* Product Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.product-card {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid #eaedf3;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.product-image {
+    height: 200px;
+    background-color: #f7f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid #eaedf3;
+}
+
+.product-image img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.product-info {
+    padding: 15px;
+}
+
+.product-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: #2c3a47;
+}
+
+.product-category {
+    color: #667b94;
+    font-size: 14px;
+}
+
+.product-price {
+    font-weight: 700;
+    color: #1a4f8a;
+    margin-top: 8px;
+}
+
+.product-rating {
+    color: #f5b041;
+    margin-top: 8px;
+}
+
+.recommendation-badge {
+    background-color: #3e92cc;
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+/* User Profile */
+.profile-section {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-stats {
+    flex: 1;
+    background-color: #f0f7ff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #d9e6f2;
+}
+
+.profile-info h3, .profile-stats h3 {
+    color: #1a4f8a;
+    margin-top: 0;
+}
+
+.stats-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e1e8f0;
+}
+
+.stats-item:last-child {
+    border-bottom: none;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .profile-section {
+        flex-direction: column;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Smart Shop</h1>
+            <nav class="nav-links">
+                <a href="#profile">Profile</a>
+                <a href="#recommendations">Recommendations</a>
+                <a href="#trending">Trending</a>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container">
+        <!-- Initial Questionnaire (Profile Setup) -->
+        <section id="questionnaire" class="card">
+            <h2>Complete Your Profile</h2>
+            <p>Answer a few questions to get personalized recommendations</p>
+            
+            <form id="profile-form">
+                <div class="form-group">
+                    <label for="user-type">What best describes you?</label>
+                    <select id="user-type" required>
+                        <option value="">Please select</option>
+                        <option value="student">Student</option>
+                        <option value="employee">Employee</option>
+                        <option value="homemaker">Homemaker</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shopping-interests">What type of shopping are you interested in? (Select all that apply)</label>
+                    <div>
+                        <input type="checkbox" id="interest-grocery" value="grocery">
+                        <label for="interest-grocery" style="display:inline">Grocery</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="interest-medicine" value="medicine">
+                        <label for="interest-medicine" style="display:inline">Medicine</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="interest-electronics" value="electronics">
+                        <label for="interest-electronics" style="display:inline">Electronics</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="interest-stationary" value="stationary">
+                        <label for="interest-stationary" style="display:inline">Stationary</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="others" value="others">
+                        <label for="interest-others" style="display:inline">Others</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shopping-frequency">How often do you shop online?</label>
+                    <select id="shopping-frequency" required>
+                        <option value="">Please select</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="rarely">Rarely</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="budget-range">What is your typical budget range?</label>
+                    <select id="budget-range" required>
+                        <option value="">Please select</option>
+                        <option value="economy">Economy ($)</option>
+                        <option value="mid-range">Mid-range ($$)</option>
+                        <option value="premium">Premium ($$$)</option>
+                    </select>
+                </div>
+                
+                <button type="submit">Save Profile</button>
+            </form>
+        </section>
+        
+        <!-- User Profile (Hidden initially) -->
+        <section id="profile" class="card hidden">
+            <h2>Your Profile</h2>
+            <div class="profile-section">
+                <div class="profile-info">
+                    <h3>Personal Information</h3>
+                    <p id="profile-type">User Type: <span>Student</span></p>
+                    <p id="profile-interests">Interests: <span>Grocery, Books</span></p>
+                    <p id="profile-frequency">Shopping Frequency: <span>Weekly</span></p>
+                    <p id="profile-budget">Budget Range: <span>Mid-range</span></p>
+                    <button id="edit-profile">Edit Profile</button>
+                </div>
+                <div class="profile-stats">
+                    <h3>Your Shopping Stats</h3>
+                    <div class="stats-item">
+                        <span>Recent purchases</span>
+                        <span>12</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>Categories browsed</span>
+                        <span>4</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>Favorite category</span>
+                        <span>Grocery</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>Recommendation accuracy</span>
+                        <span>78%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Recommendations Section (Hidden initially) -->
+        <section id="recommendations" class="card hidden">
+            <h2>Recommended for You</h2>
+            <p>Based on your preferences and similar users' choices</p>
+            
+            <div class="products-grid" id="recommended-products">
+                <!-- Products will be inserted here via JavaScript -->
+            </div>
+        </section>
+        
+        <!-- Trending Items Section (Hidden initially) -->
+        <section id="trending" class="card hidden">
+            <h2>Trending in Your Categories</h2>
+            <p>Popular items among users with similar interests</p>
+            
+            <div class="products-grid" id="trending-products">
+                <!-- Trending products will be inserted here via JavaScript -->
+            </div>
+        </section>
+    </main>
+    
+    <script>
+        // Sample products database
+        const productsDatabase = {
+    grocery: [
+        { id: 'g1', title: 'Organic Bananas', category: 'Grocery', price: '$4.99', rating: 4.8, image: 'Banana.jpg', trending: true },
+        { id: 'g2', title: 'Whole Grain Bread', category: 'Grocery', price: '$3.49', rating: 4.5, image: 'Bread.jpg', trending: false },
+        { id: 'g3', title: 'Greek Yogurt Pack', category: 'Grocery', price: '$5.99', rating: 4.7, image: 'ijn.jpg', trending: true },
+        { id: 'g4', title: 'Fresh Avocados', category: 'Grocery', price: '$6.99', rating: 4.9, image: 'Avacado.jpg', trending: false },
+        { id: 'g5', title: 'Organic Eggs (Dozen)', category: 'Grocery', price: '$5.49', rating: 4.6, image: 'Egg.jpg', trending: true },
+        { id: 'g6', title: 'Italian Olive Oil', category: 'Grocery', price: '$12.99', rating: 4.7, image: 'Oliveoil.jpg', trending: false },
+        { id: 'g7', title: 'Honey (Local)', category: 'Grocery', price: '$7.99', rating: 4.8, image: 'Honey.jpg', trending: true },
+        { id: 'g8', title: 'Mixed Berries', category: 'Grocery', price: '$6.49', rating: 4.5, image: 'Jerry.jpg', trending: false },
+        { id: 'g9', title: 'Grass-Fed Ground Beef', category: 'Grocery', price: '$9.99', rating: 4.6, image: 'Beef.jpg', trending: true },
+        { id: 'g10', title: 'Organic Spinach', category: 'Grocery', price: '$3.99', rating: 4.7, image: 'Spinach.jpg', trending: false }
+    ],
+    electronics: [
+        { id: 'e1', title: 'Wireless Earbuds', category: 'Electronics', price: '$59.99', rating: 4.5, image: '/api/placeholder/250/180', trending: true },
+        { id: 'e2', title: 'Smart Watch', category: 'Electronics', price: '$129.99', rating: 4.6, image: '/api/placeholder/250/180', trending: false },
+        { id: 'e3', title: 'Bluetooth Speaker', category: 'Electronics', price: '$45.99', rating: 4.4, image: '/api/placeholder/250/180', trending: true },
+        { id: 'e4', title: 'Noise-Canceling Headphones', category: 'Electronics', price: '$149.99', rating: 4.7, image: '/api/placeholder/250/180', trending: false },
+        { id: 'e5', title: 'Portable Power Bank', category: 'Electronics', price: '$34.99', rating: 4.5, image: '/api/placeholder/250/180', trending: true },
+        { id: 'e6', title: 'Smart Home Hub', category: 'Electronics', price: '$89.99', rating: 4.3, image: '/api/placeholder/250/180', trending: false },
+        { id: 'e7', title: '4K Streaming Device', category: 'Electronics', price: '$49.99', rating: 4.6, image: '/api/placeholder/250/180', trending: true },
+        { id: 'e8', title: 'Wireless Charging Pad', category: 'Electronics', price: '$24.99', rating: 4.2, image: '/api/placeholder/250/180', trending: false },
+        { id: 'e9', title: 'Digital Camera', category: 'Electronics', price: '$299.99', rating: 4.8, image: '/api/placeholder/250/180', trending: true },
+        { id: 'e10', title: 'Gaming Controller', category: 'Electronics', price: '$59.99', rating: 4.4, image: '/api/placeholder/250/180', trending: false }
+    ],
+    stationary: [
+        { id: 's1', title: 'Premium Notebook', category: 'Stationary', price: '$12.99', rating: 4.6, image: '/api/placeholder/250/180', trending: true },
+        { id: 's2', title: 'Gel Pen Set', category: 'Stationary', price: '$8.99', rating: 4.4, image: '/api/placeholder/250/180', trending: false },
+        { id: 's3', title: 'Desk Organizer', category: 'Stationary', price: '$19.99', rating: 4.5, image: '/api/placeholder/250/180', trending: true },
+        { id: 's4', title: 'Colored Markers', category: 'Stationary', price: '$14.99', rating: 4.3, image: '/api/placeholder/250/180', trending: false },
+        { id: 's5', title: 'Sticky Notes Pack', category: 'Stationary', price: '$5.99', rating: 4.2, image: '/api/placeholder/250/180', trending: true },
+        { id: 's6', title: 'Art Sketchbook', category: 'Stationary', price: '$15.99', rating: 4.7, image: '/api/placeholder/250/180', trending: false },
+        { id: 's7', title: 'Mechanical Pencils', category: 'Stationary', price: '$7.99', rating: 4.5, image: '/api/placeholder/250/180', trending: true },
+        { id: 's8', title: 'File Folders', category: 'Stationary', price: '$9.99', rating: 4.1, image: '/api/placeholder/250/180', trending: false },
+        { id: 's9', title: 'Desk Calendar', category: 'Stationary', price: '$11.99', rating: 4.4, image: '/api/placeholder/250/180', trending: true },
+        { id: 's10', title: 'Correction Tape', category: 'Stationary', price: '$4.99', rating: 4.3, image: '/api/placeholder/250/180', trending: false }
+    ],
+    medicines: [
+        { id: 'm1', title: 'Multivitamin Tablets', category: 'Medicines', price: '$12.99', rating: 4.6, image: '/api/placeholder/250/180', trending: true },
+        { id: 'm2', title: 'Pain Relief Gel', category: 'Medicines', price: '$8.49', rating: 4.3, image: '/api/placeholder/250/180', trending: false },
+        { id: 'm3', title: 'First Aid Kit', category: 'Medicines', price: '$15.99', rating: 4.7, image: '/api/placeholder/250/180', trending: true },
+        { id: 'm4', title: 'Allergy Relief Tablets', category: 'Medicines', price: '$11.99', rating: 4.5, image: '/api/placeholder/250/180', trending: false },
+        { id: 'm5', title: 'Digital Thermometer', category: 'Medicines', price: '$19.99', rating: 4.8, image: '/api/placeholder/250/180', trending: true },
+        { id: 'm6', title: 'Sleep Aid Supplement', category: 'Medicines', price: '$14.49', rating: 4.2, image: '/api/placeholder/250/180', trending: false },
+        { id: 'm7', title: 'Vitamin C Gummies', category: 'Medicines', price: '$9.99', rating: 4.6, image: '/api/placeholder/250/180', trending: true },
+        { id: 'm8', title: 'Digestive Enzymes', category: 'Medicines', price: '$16.99', rating: 4.4, image: '/api/placeholder/250/180', trending: false },
+        { id: 'm9', title: 'Blood Pressure Monitor', category: 'Medicines', price: '$39.99', rating: 4.7, image: '/api/placeholder/250/180', trending: true },
+        { id: 'm10', title: 'Compression Bandage', category: 'Medicines', price: '$7.99', rating: 4.3, image: '/api/placeholder/250/180', trending: false }
+    ],
+    others: [
+        { id: 'o1', title: 'Yoga Mat', category: 'Others', price: '$24.99', rating: 4.5, image: '/api/placeholder/250/180', trending: true },
+        { id: 'o2', title: 'Water Bottle', category: 'Others', price: '$14.99', rating: 4.3, image: '/api/placeholder/250/180', trending: false },
+        { id: 'o3', title: 'Plant Pot Set', category: 'Others', price: '$19.99', rating: 4.4, image: '/api/placeholder/250/180', trending: true },
+        { id: 'o4', title: 'Car Air Freshener', category: 'Others', price: '$6.99', rating: 4.1, image: '/api/placeholder/250/180', trending: false },
+        { id: 'o5', title: 'Pet Grooming Kit', category: 'Others', price: '$29.99', rating: 4.6, image: '/api/placeholder/250/180', trending: true },
+        { id: 'o6', title: 'Travel Pillow', category: 'Others', price: '$16.99', rating: 4.2, image: '/api/placeholder/250/180', trending: false },
+        { id: 'o7', title: 'Umbrella', category: 'Others', price: '$12.99', rating: 4.3, image: '/api/placeholder/250/180', trending: true },
+        { id: 'o8', title: 'Gift Wrapping Set', category: 'Others', price: '$9.99', rating: 4.0, image: '/api/placeholder/250/180', trending: false },
+        { id: 'o9', title: 'Lunch Box', category: 'Others', price: '$17.99', rating: 4.4, image: '/api/placeholder/250/180', trending: true },
+        { id: 'o10', title: 'Reusable Shopping Bags', category: 'Others', price: '$8.99', rating: 4.2, image: '/api/placeholder/250/180', trending: false }
+    ]
+};
+
+// Modified user database with updated interests and popular items
+const userDatabase = {
+    students: {
+        interests: ['stationary', 'electronics', 'grocery'],
+        popularItems: ['s1', 's2', 'e1', 'e2', 'g1', 'g2', 's3', 'e3', 'g3']
+    },
+    employees: {
+        interests: ['grocery', 'electronics', 'stationary'],
+        popularItems: ['g1', 'e2', 's1', 'g3', 'e1', 's2', 'g4', 'e4', 's4']
+    },
+    homemaker: {
+        interests: ['grocery', 'medicines', 'others'],
+        popularItems: ['g1', 'g2', 'm1', 'm2', 'o1', 'o2', 'g3', 'm3', 'o3']
+    },
+    professionals: {
+        interests: ['electronics', 'stationary', 'medicines'],
+        popularItems: ['e1', 's1', 'm1', 'e2', 's2', 'm2', 'e3', 's3', 'm3']
+    },
+    other: {
+        interests: ['others', 'grocery', 'medicines'],
+        popularItems: ['o1', 'g1', 'm1', 'o2', 'g2', 'm2', 'o3', 'g3', 'm3']
+    }
+};
+        
+        // Simulating profile data for the current user
+        let userProfile = {
+            type: '',
+            interests: [],
+            frequency: '',
+            budget: '',
+            history: []  // For tracking user behavior
+        };
+        
+        // DOM Elements
+        const questionnaireSection = document.getElementById('questionnaire');
+        const profileSection = document.getElementById('profile');
+        const recommendationsSection = document.getElementById('recommendations');
+        const trendingSection = document.getElementById('trending');
+        const profileForm = document.getElementById('profile-form');
+        const editProfileButton = document.getElementById('edit-profile');
+        
+        // Form submission - Store user profile data
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            userProfile.type = document.getElementById('user-type').value;
+            userProfile.frequency = document.getElementById('shopping-frequency').value;
+            userProfile.budget = document.getElementById('budget-range').value;
+            
+            // Get selected interests
+            userProfile.interests = [];
+            document.querySelectorAll('input[type=checkbox]:checked').forEach(checkbox => {
+                userProfile.interests.push(checkbox.value);
+            });
+            
+            // Store in localStorage (simulating database storage)
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            
+            // Update profile display
+            updateProfileDisplay();
+            
+            // Generate recommendations based on the profile
+            generateRecommendations();
+            
+            // Show profile and recommendation sections, hide questionnaire
+            questionnaireSection.classList.add('hidden');
+            profileSection.classList.remove('hidden');
+            recommendationsSection.classList.remove('hidden');
+            trendingSection.classList.remove('hidden');
+        });
+        
+        // Edit profile button functionality
+        editProfileButton.addEventListener('click', function() {
+            // Reset form with current values
+            document.getElementById('user-type').value = userProfile.type;
+            document.getElementById('shopping-frequency').value = userProfile.frequency;
+            document.getElementById('budget-range').value = userProfile.budget;
+            
+            // Check corresponding interest checkboxes
+            document.querySelectorAll('input[type=checkbox]').forEach(checkbox => {
+                checkbox.checked = userProfile.interests.includes(checkbox.value);
+            });
+            
+            // Show questionnaire, hide other sections
+            questionnaireSection.classList.remove('hidden');
+            profileSection.classList.add('hidden');
+            recommendationsSection.classList.add('hidden');
+            trendingSection.classList.add('hidden');
+        });
+        
+        // Update profile display with stored data
+        function updateProfileDisplay() {
+            document.querySelector('#profile-type span').textContent = capitalizeFirstLetter(userProfile.type);
+            document.querySelector('#profile-interests span').textContent = userProfile.interests.map(capitalizeFirstLetter).join(', ');
+            document.querySelector('#profile-frequency span').textContent = capitalizeFirstLetter(userProfile.frequency);
+            document.querySelector('#profile-budget span').textContent = capitalizeFirstLetter(userProfile.budget);
+        }
+        
+        // Helper function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        // Generate recommendations based on user profile
+        function generateRecommendations() {
+            const recommendedProductsContainer = document.getElementById('recommended-products');
+            const trendingProductsContainer = document.getElementById('trending-products');
+            
+            // Clear previous recommendations
+            recommendedProductsContainer.innerHTML = '';
+            trendingProductsContainer.innerHTML = '';
+            
+            // Get similar users' popular items
+            let similarUsersGroup = userDatabase[userProfile.type] || userDatabase.other;
+            let popularItemIds = similarUsersGroup.popularItems;
+            
+            // Content-based recommendations (from user interests)
+            let recommendedProducts = [];
+            userProfile.interests.forEach(interest => {
+                // Get 10 random products from each interest category
+                if (productsDatabase[interest]) {
+                    const randomProducts = getRandomItems(productsDatabase[interest], 10);
+                    recommendedProducts = [...recommendedProducts, ...randomProducts];
+                }
+            });
+            
+            // Collaborative filtering recommendations (from similar users)
+            let trendingProducts = [];
+            popularItemIds.forEach(itemId => {
+                // Find the product in database by id
+                for (const category in productsDatabase) {
+                    const product = productsDatabase[category].find(p => p.id === itemId);
+                    if (product && userProfile.interests.includes(category)) {
+                        trendingProducts.push(product);
+                        break;
+                    }
+                }
+            });
+            
+            // Display recommended products
+            recommendedProducts.forEach(product => {
+                recommendedProductsContainer.appendChild(createProductCard(product, 'Recommended for you'));
+            });
+            
+            // Display trending products
+            trendingProducts.forEach(product => {
+                trendingProductsContainer.appendChild(createProductCard(product, 'Popular in your network'));
+            });
+        }
+        
+        // Create product card HTML
+        function createProductCard(product, badgeText) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.setAttribute('data-product-id', product.id);
+            
+            card.innerHTML = `
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.title}">
+                </div>
+                <div class="product-info">
+                    <div class="recommendation-badge">${badgeText}</div>
+                    <div class="product-title">${product.title}</div>
+                    <div class="product-category">${product.category}</div>
+                    <div class="product-price">${product.price}</div>
+                    <div class="product-rating">★ ${product.rating}</div>
+                </div>
+            `;
+            
+            // Add event listener for tracking user behavior
+            card.addEventListener('click', function() {
+                trackUserBehavior('view', product);
+            });
+            
+            return card;
+        }
+        
+        // Track user behavior for improving recommendations
+        function trackUserBehavior(action, product) {
+            // In a real app, this would send data to your backend
+            console.log(`User ${action}ed product: ${product.id}`);
+            
+            // Add to user history
+            userProfile.history.push({
+                timestamp: new Date().toISOString(),
+                action: action,
+                productId: product.id,
+                category: product.category
+            });
+            
+            // Update localStorage (simulating database update)
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+        }
+        
+        // Helper function to get random items from array
+        function getRandomItems(array, count) {
+            const shuffled = [...array].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+        
+        // Check if user already has a profile
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                userProfile = JSON.parse(savedProfile);
+                updateProfileDisplay();
+                generateRecommendations();
+                
+                // Show profile and recommendation sections, hide questionnaire
+                questionnaireSection.classList.add('hidden');
+                profileSection.classList.remove('hidden');
+                recommendationsSection.classList.remove('hidden');
+                trendingSection.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
